@@ -44,6 +44,10 @@ if "question_start_time" not in st.session_state:
 if "has_answered" not in st.session_state:
     st.session_state.has_answered = False
 
+if "category" not in st.session_state:
+    st.session_state.category = None  # quiz category
+
+
 # -------------------------
 # SIDEBAR MENU
 # -------------------------
@@ -55,43 +59,58 @@ st.session_state.page = st.sidebar.radio(
 )
 
 # -------------------------
-# QUESTIONS
+# QUESTION CATEGORIES
 # -------------------------
-questions = [
-    {
-        "question": "What is equity financing?",
-        "options": [
-            "Borrowing money you must repay",
-            "Selling ownership in the company",
-            "A type of short-term loan"
-        ],
-        "answer": 1,
-        "value": 500,
-        "explanation": "Equity financing means selling shares of your company to raise money."
-    },
-    {
-        "question": "What does 'burn rate' refer to?",
-        "options": [
-            "The rate at which the startup spends cash",
-            "The valuation of the startup",
-            "The growth rate of customers"
-        ],
-        "answer": 0,
-        "value": 700,
-        "explanation": "Burn rate is how quickly a startup spends cash reserves each month."
-    },
-    {
-        "question": "What is a term sheet?",
-        "options": [
-            "A legal requirement for hiring employees",
-            "A non-binding outline of investment terms",
-            "A startup's financial statement"
-        ],
-        "answer": 1,
-        "value": 900,
-        "explanation": "A term sheet outlines the key terms of an investment deal."
-    }
-]
+question_categories = {
+    "Balance Sheet": [
+        {
+            "question": "What is a balance sheet?",
+            "options": [
+                "A statement of a company’s assets, liabilities, and equity",
+                "A record of cash inflows and outflows",
+                "A forecast of future earnings"
+            ],
+            "answer": 0,
+            "value": 600,
+            "explanation": "A balance sheet shows assets, liabilities, and equity at a specific point in time."
+        },
+        {
+            "question": "What is an asset?",
+            "options": [
+                "Something the company owes",
+                "Something the company owns",
+                "The company’s profit"
+            ],
+            "answer": 1,
+            "value": 500,
+            "explanation": "Assets are resources the company owns that have economic value."
+        },
+    ],
+    "Cash Flow Management": [
+        {
+            "question": "What does operating cash flow measure?",
+            "options": [
+                "Profit including non-cash expenses",
+                "Cash generated from core business activities",
+                "Cash spent on new investments"
+            ],
+            "answer": 1,
+            "value": 700,
+            "explanation": "Operating cash flow measures the cash produced by a company’s normal operations."
+        },
+        {
+            "question": "Why is cash flow important?",
+            "options": [
+                "It shows long-term profitability",
+                "It determines short-term liquidity",
+                "It measures tax efficiency"
+            ],
+            "answer": 1,
+            "value": 600,
+            "explanation": "Healthy cash flow ensures the company can pay its bills and survive."
+        },
+    ],
+}
 
 # -------------------------
 # STORE ITEMS (with Premium)
@@ -111,9 +130,10 @@ store_items = {
 
 
 # -------------------------
-# HELPER: Get avatar emoji
+# HELPERS
 # -------------------------
 def get_avatar_emoji():
+    """Return the emoji representing the currently equipped outfit, or default avatar."""
     if st.session_state.equipped:
         for category_items in store_items.values():
             for item in category_items:
@@ -122,11 +142,19 @@ def get_avatar_emoji():
     return "🧍"
 
 
+def get_active_questions():
+    """Return the list of questions for the currently selected category."""
+    if st.session_state.category is None:
+        return []
+    return question_categories[st.session_state.category]
+
+
 # -------------------------
 # GAME LOGIC FUNCTIONS
 # -------------------------
 def check_answer(choice):
     """Evaluate the answer, update money, and show result."""
+    questions = get_active_questions()
     q = questions[st.session_state.index]
     options = q["options"]
 
@@ -164,6 +192,7 @@ def check_answer(choice):
 
 def next_question():
     """Move to the next question and reset per-question state."""
+    questions = get_active_questions()
     st.session_state.index += 1
     st.session_state.show_result = False
     st.session_state.has_answered = False
@@ -172,6 +201,15 @@ def next_question():
     if st.session_state.index >= len(questions):
         st.session_state.index = len(questions)
         st.session_state.show_result = True
+
+
+def reset_category():
+    """Reset category selection and question progress."""
+    st.session_state.category = None
+    st.session_state.index = 0
+    st.session_state.show_result = False
+    st.session_state.question_start_time = None
+    st.session_state.has_answered = False
 
 
 # -------------------------
@@ -197,7 +235,7 @@ if st.session_state.page == "store":
                         st.session_state.equipped = item["name"]
                         st.success(f"You equipped: {item['name']}")
                 else:
-                    st.info("Premium active ✅")
+                    st.info("Premium active ✅ (effect to be defined)")
             else:
                 if st.button(f"Buy {item['name']}", key=f"buy_{category}_{i}"):
                     if st.session_state.money >= item["price"]:
@@ -233,8 +271,9 @@ if st.session_state.page == "avatar":
     else:
         st.write("No outfit equipped yet. Visit the store to buy one!")
 
-    if any(item in st.session_state.inventory for item in [p["name"] for p in store_items["Premium"]]):
-        st.write("Premium status: ✅ (effect to be defined)")
+    premium_names = [p["name"] for p in store_items["Premium"]]
+    if any(item in st.session_state.inventory for item in premium_names):
+        st.write("Premium status: ✅ (effects coming soon)")
     else:
         st.write("Premium status: ❌")
 
@@ -246,11 +285,31 @@ if st.session_state.page == "avatar":
 # -------------------------
 if st.session_state.page == "quiz":
 
-    # Auto-refresh for live countdown (only while question is active and not answered)
-    if st.session_state.index < len(questions) and not st.session_state.show_result:
+    # -------- CATEGORY SELECTION --------
+    if st.session_state.category is None:
+        st.title("💰 Entrepreneurial Finance Quiz")
+        st.subheader("📚 Choose a Category")
+
+        chosen = st.radio("Select a topic to begin:", list(question_categories.keys()))
+
+        if st.button("Start Category"):
+            st.session_state.category = chosen
+            st.session_state.index = 0
+            st.session_state.show_result = False
+            st.session_state.has_answered = False
+            st.session_state.question_start_time = None
+
+        st.stop()
+
+    # We have a category selected from here on
+    active_questions = get_active_questions()
+
+    # Auto-refresh for live countdown (only while a question is active and no result yet)
+    if st.session_state.index < len(active_questions) and not st.session_state.show_result:
         st_autorefresh(interval=200, key="quiz_refresh")
 
     st.title("💰 Entrepreneurial Finance Quiz")
+    st.write(f"Category: **{st.session_state.category}**")
     st.write("Answer questions before time runs out. Correct answers earn money, wrong answers lose money!")
 
     # Status bar: avatar + capital
@@ -269,15 +328,15 @@ if st.session_state.page == "quiz":
     if "question_start_time" not in st.session_state:
         st.session_state.question_start_time = None
 
-    if st.session_state.index < len(questions):
+    if st.session_state.index < len(active_questions):
 
-        q = questions[st.session_state.index]
+        q = active_questions[st.session_state.index]
 
         # Start the timer ONLY when the question appears
         if st.session_state.question_start_time is None:
             st.session_state.question_start_time = time.time()
 
-        st.subheader(f"Question {st.session_state.index + 1}")
+        st.subheader(f"Question {st.session_state.index + 1} / {len(active_questions)}")
         st.write(q["question"])
 
         # TIMER
@@ -295,7 +354,7 @@ if st.session_state.page == "quiz":
         st.write(f"❌ Wrong answer penalty: **-${int(base_value * WRONG_PENALTY_FACTOR)}**")
 
         # Answer options
-        choice_key = f"q_{st.session_state.index}"
+        choice_key = f"q_{st.session_state.category}_{st.session_state.index}"
         choice = st.radio("Choose an answer:", q["options"], key=choice_key)
 
         # Manual submit
@@ -305,7 +364,6 @@ if st.session_state.page == "quiz":
 
         # Auto-submit on timeout (Option A)
         if time_left <= 0 and not st.session_state.has_answered:
-            # Use whatever is currently selected; if nothing, treated as incorrect
             current_choice = st.session_state.get(choice_key, None)
             check_answer(current_choice)
 
@@ -321,12 +379,16 @@ if st.session_state.page == "quiz":
             st.button("Next Question", on_click=next_question)
 
     else:
-        st.header("🎉 Game Over!")
+        # No more questions in this category
+        st.header("🎉 Category Complete!")
+        st.subheader(f"Category: **{st.session_state.category}**")
         st.subheader(f"Total capital: **${st.session_state.money}**")
 
-        if st.button("Play Again"):
+        if st.button("Play This Category Again"):
             st.session_state.index = 0
-            st.session_state.money = 0
             st.session_state.show_result = False
             st.session_state.question_start_time = None
             st.session_state.has_answered = False
+
+        if st.button("Choose Another Category"):
+            reset_category()
