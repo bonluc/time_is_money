@@ -269,7 +269,7 @@ if st.session_state.page == "avatar":
     if st.session_state.equipped:
         st.write(f"Currently wearing: **{st.session_state.equipped}**")
     else:
-        st.write("No outfit equipped yet. Visit the store to buy one!")
+        st.write("Basic outfit equipped. Visit the store to buy hustler clothing!")
 
     premium_names = [p["name"] for p in store_items["Premium"]]
     if any(item in st.session_state.inventory for item in premium_names):
