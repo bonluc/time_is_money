@@ -236,7 +236,7 @@ question_categories = {
         {
             "question": (
                 "A startup founder owns 100 pct. of 1,000,000 shares. They take a Series A investment that values "
-                "the company at $10 million post-money and gives the investor 20 pct. of the company. "
+                "the company at 10 million post-money and gives the investor 20 pct. of the company. "
                 "How many new shares were issued in this round?"
             ),
             "options": [
@@ -285,8 +285,8 @@ question_categories = {
             "answer": 3,
             "value": 800,
             "explanation": (
-                "The 2x non-participating preference entitles them to up to $20m, "
-                "but the exit is only $15m, so they get $15m."
+                "The 2x non-participating preference entitles them to up to 20m, "
+                "but the exit is only 15m, so they get 15m."
             ),
         },
     ],
