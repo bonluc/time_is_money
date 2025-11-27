@@ -299,7 +299,7 @@ store_items = {
     "Outfits": [
         {"name": "Classic Suit", "price": 800, "emoji": "🤵"},
         {"name": "Blue Business Suit", "price": 1200, "emoji": "🕴️"},
-        {"name": "Fancy Investor Suit", "price": 2000, "emoji": "💼"},
+        {"name": "Fancy Investor", "price": 2000, "emoji": "💼"},
         {"name": "Silicon Valley Hoodie", "price": 500, "emoji": "🧑‍💻"},
     ],
     "Premium": [
@@ -337,8 +337,6 @@ def save_to_leaderboard():
     row = [
         st.session_state.username,
         st.session_state.money,
-        st.session_state.category,
-        datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
     ]
 
     file_exists = os.path.exists(LEADERBOARD_FILE)
@@ -347,10 +345,11 @@ def save_to_leaderboard():
         writer = csv.writer(f)
         # Write header if file is new/empty
         if not file_exists:
-            writer.writerow(["username", "capital", "category", "timestamp"])
+            writer.writerow(["username", "capital"])
         writer.writerow(row)
 
     st.session_state.saved_this_round = True
+
 
 
 # -------------------------
