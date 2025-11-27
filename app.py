@@ -267,12 +267,12 @@ question_categories = {
             # Founder keeps 60% of remaining 75%: 0.6 * 0.75 = 0.45 -> 45% -> index 3
             "answer": 3,
             "value": 800,
-            "explanation": "The founder owns 60 pct. of the remaining 75 pct., so 0.6 × 0.75 = 45 pct.",
+            "explanation": "The founder owns 60 pct. of the remaining 75 pct., so 0.6 * 0.75 = 45 pct.",
         },
         {
             "question": (
-                "A VC firm invests $10 million for 20 pct. of a company with a 2x Non-Participating "
-                "Liquidation Preference. If the company is acquired for $15 million, "
+                "A VC firm invests 10 million for 20 pct. of a company with a 2x Non-Participating "
+                "Liquidation Preference. If the company is acquired for 15 million, "
                 "how much does the investor receive?"
             ),
             "options": [
