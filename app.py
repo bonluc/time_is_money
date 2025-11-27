@@ -1,4 +1,9 @@
 import time
+import os
+import csv
+from datetime import datetime
+
+import pandas as pd
 import streamlit as st
 from streamlit_autorefresh import st_autorefresh
 
@@ -8,7 +13,8 @@ st.set_page_config(page_title="Entrepreneurial Finance Quiz", page_icon="💰")
 # CONSTANTS
 # -------------------------
 MAX_TIME = 20  # seconds per question
-WRONG_PENALTY_FACTOR = 0.5  # lose 50% of base value on wrong answer
+WRONG_PENALTY_FACTOR = 0.3  # lose 30% of base value on wrong answer
+LEADERBOARD_FILE = "leaderboard.csv"
 
 
 # -------------------------
@@ -47,6 +53,12 @@ if "has_answered" not in st.session_state:
 if "category" not in st.session_state:
     st.session_state.category = None  # quiz category
 
+if "username" not in st.session_state:
+    st.session_state.username = None
+
+if "saved_this_round" not in st.session_state:
+    st.session_state.saved_this_round = False
+
 
 # -------------------------
 # SIDEBAR MENU
@@ -54,9 +66,44 @@ if "category" not in st.session_state:
 st.sidebar.title("Menu")
 st.session_state.page = st.sidebar.radio(
     "Go to:",
-    ("quiz", "store", "avatar"),
+    ("quiz", "store", "avatar", "leaderboard"),
     format_func=lambda x: x.capitalize()
 )
+
+# ---------------------------
+# USERNAME LOGIN SCREEN
+# ---------------------------
+if st.session_state.username is None:
+    st.title("🎮 Welcome to Time is Money!")
+    st.subheader("Please enter your player name to begin")
+
+    name_input = st.text_input("Your player name:")
+
+    if st.button("Continue"):
+        if name_input.strip() != "":
+            chosen_name = name_input.strip()
+
+            # Ensure unique name by checking leaderboard.csv
+            if os.path.exists(LEADERBOARD_FILE):
+                df = pd.read_csv(LEADERBOARD_FILE)
+                existing = df["username"].tolist()
+            else:
+                existing = []
+
+            # Generate increment if necessary
+            base = chosen_name
+            suffix = 1
+            while chosen_name in existing:
+                chosen_name = f"{base} ({suffix})"
+                suffix += 1
+
+            st.session_state.username = chosen_name
+            st.success(f"Welcome, {chosen_name}!")
+            #st.experimental_rerun()
+            st.rerun()
+
+
+    st.stop()
 
 # -------------------------
 # QUESTION CATEGORIES
@@ -64,50 +111,183 @@ st.session_state.page = st.sidebar.radio(
 question_categories = {
     "Balance Sheet": [
         {
-            "question": "What is a balance sheet?",
+            "question": "What is the accounting equation?",
             "options": [
-                "A statement of a company’s assets, liabilities, and equity",
-                "A record of cash inflows and outflows",
-                "A forecast of future earnings"
+                "Assets = Revenue + Expenses",
+                "Assets = Liabilities + Equity",
+                "Liabilities = Assets + Equity",
+                "Equity = Assets * Liabilities",
             ],
-            "answer": 0,
+            # Correct: Assets = Liabilities + Equity -> index 1
+            "answer": 1,
             "value": 600,
-            "explanation": "A balance sheet shows assets, liabilities, and equity at a specific point in time."
+            "explanation": (
+                "The accounting equation is Assets = Liabilities + Equity. "
+                "Assets are what the business owns, funded by liabilities (what it owes) "
+                "and equity (the owners' claim on the assets)."
+            ),
         },
         {
-            "question": "What is an asset?",
+            "question": "What are the main sections of a balance sheet?",
             "options": [
-                "Something the company owes",
-                "Something the company owns",
-                "The company’s profit"
+                "Revenue, Expenses, Profit",
+                "Assets, Liabilities, Equity",
+                "Cash Flow, Income, Expenses",
+                "Investments, Dividends, Retained Earnings",
             ],
+            # Correct: Assets, Liabilities, Equity -> index 1
             "answer": 1,
             "value": 500,
-            "explanation": "Assets are resources the company owns that have economic value."
+            "explanation": (
+                "A balance sheet is split into Assets, Liabilities, and Equity, "
+                "reflecting the accounting equation."
+            ),
+        },
+        {
+            "question": "Given total assets of 500.000 and total liabilities of 350.000, what is owner's equity?",
+            "options": [
+                "850.000",
+                "350.000",
+                "150.000",
+                "500.000",
+            ],
+            # Equity = Assets - Liabilities = 150.000 -> index 2
+            "answer": 2,
+            "value": 500,
+            "explanation": (
+                "Using Assets = Liabilities + Equity, rearrange to Equity = Assets − Liabilities: "
+                "500.000 − 350.000 = 150.000."
+            ),
         },
     ],
     "Cash Flow Management": [
         {
-            "question": "What does operating cash flow measure?",
+            "question": "What is the primary purpose of a cash flow statement?",
             "options": [
-                "Profit including non-cash expenses",
-                "Cash generated from core business activities",
-                "Cash spent on new investments"
+                "To determine employee productivity",
+                "To monitor the inflow and outflow of cash",
+                "To track inventory levels",
+                "To calculate net profit",
             ],
+            # Correct: monitor inflow/outflow of cash -> index 1
             "answer": 1,
             "value": 700,
-            "explanation": "Operating cash flow measures the cash produced by a company’s normal operations."
+            "explanation": "A cash flow statement tracks how cash moves in and out of the business.",
         },
         {
-            "question": "Why is cash flow important?",
+            "question": "Which financial metric helps assess a startup’s ability to meet short-term obligations?",
             "options": [
-                "It shows long-term profitability",
-                "It determines short-term liquidity",
-                "It measures tax efficiency"
+                "Current Ratio",
+                "Debt-to-equity ratio",
+                "Gross margin",
+                "Return on investment (ROI)",
             ],
+            # Correct: Current Ratio -> index 0
+            "answer": 0,
+            "value": 600,
+            "explanation": "The current ratio compares current assets to current liabilities.",
+        },
+        {
+            "question": "Operating cash flow differs from free cash flow because free cash flow:",
+            "options": [
+                "Excludes depreciation",
+                "Includes capital expenditures deducted",
+                "Does not account for working capital changes",
+                "Measures revenue only",
+            ],
+            # Correct: includes capex deducted -> index 1
             "answer": 1,
             "value": 600,
-            "explanation": "Healthy cash flow ensures the company can pay its bills and survive."
+            "explanation": (
+                "Free cash flow = Operating cash flow − Capital expenditures, "
+                "showing cash available to grow the business or return to investors."
+            ),
+        },
+    ],
+    "Startup Finance": [
+        {
+            "question": "Which of the following is a common source of early-stage funding for startups?",
+            "options": [
+                "Corporate bonds",
+                "Angel investors",
+                "Initial Public Offering (IPO)",
+                "Venture capital",
+            ],
+            # Early stage: Angel investors -> index 1
+            "answer": 1,
+            "value": 800,
+            "explanation": "Angel investors often fund very early-stage startups before VCs enter.",
+        },
+        {
+            "question": "What is the role of equity financing in a startup?",
+            "options": [
+                "To repay existing loans",
+                "To reduce operating expenses",
+                "To raise capital in exchange for ownership",
+                "To increase product prices",
+            ],
+            # Correct: raise capital for ownership -> index 2
+            "answer": 2,
+            "value": 500,
+            "explanation": "Equity financing gives investors shares in exchange for capital.",
+        },
+    ],
+    "Venture Capital and Equity Dilution": [
+        {
+            "question": (
+                "A startup founder owns 100% of 1,000,000 shares. They take a Series A investment that values "
+                "the company at $10 million post-money and gives the investor 20% of the company. "
+                "How many new shares were issued in this round?"
+            ),
+            "options": [
+                "250.000 new shares",
+                "200.000 new shares",
+                "125.000 new shares",
+                "500.000 new shares",
+            ],
+            # Solve 0.2 = x / (1,000,000 + x) => x = 250,000 -> index 0
+            "answer": 0,
+            "value": 700,
+            "explanation": (
+                "0.2 = x / (1,000,000 + x) leads to x = 250,000 new shares, which is 20% post-money."
+            ),
+        },
+        {
+            "question": (
+                "A founder owns 60% of the company before a funding round. "
+                "The new investor purchases 25% of the company in the round. "
+                "What is the founder's ownership percentage immediately after this funding round?"
+            ),
+            "options": [
+                "48%",
+                "50%",
+                "35%",
+                "45%",
+            ],
+            # Founder keeps 60% of remaining 75%: 0.6 * 0.75 = 0.45 -> 45% -> index 3
+            "answer": 3,
+            "value": 800,
+            "explanation": "The founder owns 60% of the remaining 75%, so 0.6 × 0.75 = 45%.",
+        },
+        {
+            "question": (
+                "A VC firm invests $10 million for 20% of a company with a 2x Non-Participating "
+                "Liquidation Preference. If the company is acquired for $15 million, "
+                "how much does the investor receive?"
+            ),
+            "options": [
+                "$20 million",
+                "$3 million",
+                "$10 million",
+                "$15 million",
+            ],
+            # 2x preference is $20m but capped by exit value: $15m -> index 3
+            "answer": 3,
+            "value": 800,
+            "explanation": (
+                "The 2x non-participating preference entitles them to up to $20m, "
+                "but the exit is only $15m, so they get $15m."
+            ),
         },
     ],
 }
@@ -123,7 +303,7 @@ store_items = {
         {"name": "Silicon Valley Hoodie", "price": 500, "emoji": "🧑‍💻"},
     ],
     "Premium": [
-        {"name": "Linked Premium Badge", "price": 5000, "emoji": "🔗"},
+        {"name": "LinkedIn Premium Badge", "price": 5000, "emoji": "🔗"},
         {"name": "Premium Investor Access", "price": 10000, "emoji": "🏛️"},
     ],
 }
@@ -147,6 +327,30 @@ def get_active_questions():
     if st.session_state.category is None:
         return []
     return question_categories[st.session_state.category]
+
+
+def save_to_leaderboard():
+    """Append current user result to leaderboard.csv once per category completion."""
+    if st.session_state.saved_this_round:
+        return
+
+    row = [
+        st.session_state.username,
+        st.session_state.money,
+        st.session_state.category,
+        datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    ]
+
+    file_exists = os.path.exists(LEADERBOARD_FILE)
+
+    with open(LEADERBOARD_FILE, "a", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        # Write header if file is new/empty
+        if not file_exists:
+            writer.writerow(["username", "capital", "category", "timestamp"])
+        writer.writerow(row)
+
+    st.session_state.saved_this_round = True
 
 
 # -------------------------
@@ -210,6 +414,7 @@ def reset_category():
     st.session_state.show_result = False
     st.session_state.question_start_time = None
     st.session_state.has_answered = False
+    st.session_state.saved_this_round = False
 
 
 # -------------------------
@@ -261,7 +466,7 @@ if st.session_state.page == "avatar":
             {avatar_emoji}
         </h1>
         """,
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
 
     st.subheader(f"Total capital: ${st.session_state.money}")
@@ -276,6 +481,25 @@ if st.session_state.page == "avatar":
         st.write("Premium status: ✅ (effects coming soon)")
     else:
         st.write("Premium status: ❌")
+
+    st.stop()
+
+
+# -------------------------
+# LEADERBOARD PAGE
+# -------------------------
+if st.session_state.page == "leaderboard":
+    st.title("🏆 Leaderboard")
+
+    if os.path.exists(LEADERBOARD_FILE):
+        df = pd.read_csv(LEADERBOARD_FILE)
+        # Sort by highest capital
+        df = df.sort_values(by="capital", ascending=False)
+
+        st.write("### Top Players (All Time)")
+        st.dataframe(df)
+    else:
+        st.info("No leaderboard data yet. Complete a quiz category to add your score!")
 
     st.stop()
 
@@ -298,6 +522,7 @@ if st.session_state.page == "quiz":
             st.session_state.show_result = False
             st.session_state.has_answered = False
             st.session_state.question_start_time = None
+            st.session_state.saved_this_round = False
 
         st.stop()
 
@@ -309,6 +534,7 @@ if st.session_state.page == "quiz":
         st_autorefresh(interval=200, key="quiz_refresh")
 
     st.title("💰 Entrepreneurial Finance Quiz")
+    st.write(f"Player: **{st.session_state.username}**")
     st.write(f"Category: **{st.session_state.category}**")
     st.write("Answer questions before time runs out. Correct answers earn money, wrong answers lose money!")
 
@@ -384,11 +610,16 @@ if st.session_state.page == "quiz":
         st.subheader(f"Category: **{st.session_state.category}**")
         st.subheader(f"Total capital: **${st.session_state.money}**")
 
+        # Auto-save to leaderboard (only once per round)
+        save_to_leaderboard()
+        st.success("Your score has been saved to the leaderboard ✅")
+
         if st.button("Play This Category Again"):
             st.session_state.index = 0
             st.session_state.show_result = False
             st.session_state.question_start_time = None
             st.session_state.has_answered = False
+            st.session_state.saved_this_round = False
 
         if st.button("Choose Another Category"):
             reset_category()
