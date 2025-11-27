@@ -427,7 +427,7 @@ store_items = {
     ],
     "Premium": [
         {"name": "LinkedIn Premium Badge", "price": 5000, "emoji": "🔗"},
-        {"name": "Premium Investor Access", "price": 10000, "emoji": "🏛️"},
+        {"name": "Premium Investor Access", "price": 6000, "emoji": "🏛️"},
     ],
 }
 
