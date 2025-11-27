@@ -159,6 +159,20 @@ question_categories = {
                 "500.000 − 350.000 = 150.000."
             ),
         },
+        {
+            "question": "Which of the following is classified as a current asset on a balance sheet?",
+            "options": [
+                "Buildings",
+                "Accounts receivable",
+                "Long-term loans payable",
+                "Intangible assets",
+            ],
+            "answer": 1,
+            "value": 500,
+            "explanation": (
+                "Accounts receivable are expected to be converted to cash within the a year."
+            ),
+        },
     ],
     "Cash Flow Management": [
         {
@@ -203,6 +217,37 @@ question_categories = {
                 "showing cash available to grow the business or return to investors."
             ),
         },
+        {
+            "question": "Which action is the most effective for improving a company’s short-term cash flow",
+            "options": [
+                "Increasing long-term capital investments",
+                "Negotiating longer payment terms with suppliers",
+                "Lowering product prices",
+                "Hiring additional staff",
+            ],
+            
+            "answer": 1,
+            "value": 600,
+            "explanation": (
+                "negotiating longer payment terms delays cash outflows and improves short term cash flow."
+                ),
+        },
+        {
+            "question": "Which action is the most effective for improving a company’s short-term cash flow",
+            "options": [
+                "Increasing long-term capital investments",
+                "Negotiating longer payment terms with suppliers",
+                "Lowering product prices",
+                "Hiring additional staff",
+            ],
+            
+            "answer": 1,
+            "value": 600,
+            "explanation": (
+                "negotiating longer payment terms delays cash outflows and improves short term cash flow."
+                ),
+        },
+
     ],
     "Startup Finance": [
         {
@@ -230,6 +275,32 @@ question_categories = {
             "answer": 2,
             "value": 500,
             "explanation": "Equity financing gives investors shares in exchange for capital.",
+        },
+        {
+            "question": "What does 'burn rate' typically refer to?",
+            "options": [
+                "Interest paid on bank loans",
+                "Monthly cash spent by the startup",
+                "Money raised from investors monthly",
+                "The percentage of profits reinvested into the business",
+            ],
+            # Correct: raise capital for ownership -> index 2
+            "answer": 1,
+            "value": 500,
+            "explanation": "Burn rate represents how quickly a startup spends money each month. It is key metric in deciding the need for future investments.",
+        },
+            {
+            "question": "Which of the following is a common reason a startup uses debt financing instead of equity?",
+            "options": [
+                "To avoid paying any interest",
+                "Because the company cannot yet generate revenue",
+                "To avoid giving up ownership",
+                "Because debt is always cheaper than ownership loss",
+            ],
+            
+            "answer": 2,
+            "value": 500,
+            "explanation": "Debt financing lets startups raise funds while keeping equity intact, though it must be repaid with interest.",
         },
     ],
     "Venture Capital and Equity Dilution": [
@@ -287,6 +358,23 @@ question_categories = {
             "explanation": (
                 "The 2x non-participating preference entitles them to up to 20m, "
                 "but the exit is only 15m, so they get 15m."
+            ),
+        },
+        {
+            "question": (
+                "What is a “term sheet“ in a VC deal?"
+            ),
+            "options": [
+                "A full legally binding contract outlining investment terms",
+                "A description of the company’s financial history and equity standings",
+                "A list of employees and salaries including their stock options",
+                "A non-binding summary of key investment terms",
+            ],
+            # 2x preference is $20m but capped by exit value: $15m -> index 3
+            "answer": 3,
+            "value": 800,
+            "explanation": (
+                "A term sheet outlines the major terms of an investment before drafting the final legal agreements, it is not legally binding"
             ),
         },
     ],
