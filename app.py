@@ -235,8 +235,8 @@ question_categories = {
     "Venture Capital and Equity Dilution": [
         {
             "question": (
-                "A startup founder owns 100% of 1,000,000 shares. They take a Series A investment that values "
-                "the company at $10 million post-money and gives the investor 20% of the company. "
+                "A startup founder owns 100 pct. of 1,000,000 shares. They take a Series A investment that values "
+                "the company at $10 million post-money and gives the investor 20 pct. of the company. "
                 "How many new shares were issued in this round?"
             ),
             "options": [
@@ -254,8 +254,8 @@ question_categories = {
         },
         {
             "question": (
-                "A founder owns 60% of the company before a funding round. "
-                "The new investor purchases 25% of the company in the round. "
+                "A founder owns 60 pct. of the company before a funding round. "
+                "The new investor purchases 25 pct. of the company in the round. "
                 "What is the founder's ownership percentage immediately after this funding round?"
             ),
             "options": [
@@ -267,11 +267,11 @@ question_categories = {
             # Founder keeps 60% of remaining 75%: 0.6 * 0.75 = 0.45 -> 45% -> index 3
             "answer": 3,
             "value": 800,
-            "explanation": "The founder owns 60% of the remaining 75%, so 0.6 × 0.75 = 45%.",
+            "explanation": "The founder owns 60 pct. of the remaining 75 pct., so 0.6 × 0.75 = 45 pct.",
         },
         {
             "question": (
-                "A VC firm invests $10 million for 20% of a company with a 2x Non-Participating "
+                "A VC firm invests $10 million for 20 pct. of a company with a 2x Non-Participating "
                 "Liquidation Preference. If the company is acquired for $15 million, "
                 "how much does the investor receive?"
             ),
@@ -290,6 +290,56 @@ question_categories = {
             ),
         },
     ],
+    "Income Statement": [
+        {
+            "question": "What does the income statement primarily show?",
+            "options": [
+                "A company's cash inflows and outflows",
+                "A company’s financial position at a specific point in time",
+                "A company’s revenue, expenses, and profit over a period",
+                "How much equity owners have invested in the company"
+            ],
+            "answer": 2,
+            "value": 600,
+            "explanation": "The income statement summarizes revenues and expenses over a period, showing the company’s profit or loss."
+        },
+        {
+            "question": "Gross profit is calculated as:",
+            "options": [
+                "Revenue − Operating Expenses",
+                "Revenue − Cost of Goods Sold",
+                "Net Income − Taxes",
+                "Revenue − Depreciation"
+            ],
+            "answer": 1,
+            "value": 700,
+            "explanation": "Gross profit is revenue minus the direct costs of producing goods (COGS)."
+        },
+        {
+            "question": "Which of the following is considered an operating expense?",
+            "options": [
+                "Interest expense",
+                "Cost of raw materials",
+                "Marketing and administrative expenses",
+                "Income tax expense"
+            ],
+            "answer": 2,
+            "value": 700,
+            "explanation": "Operating expenses include marketing, admin, salaries, rent—costs needed to run daily operations."
+        },
+        {
+            "question": "Net income is best defined as:",
+            "options": [
+                "Revenue minus COGS",
+                "Gross profit minus taxes only",
+                "Revenue minus all expenses including taxes and interest",
+                "Cash received minus cash paid"
+            ],
+            "answer": 2,
+            "value": 800,
+            "explanation": "Net income is revenue minus ALL expenses: COGS, operating expenses, interest, and taxes."
+        }
+    ]
 }
 
 # -------------------------
@@ -420,7 +470,7 @@ def reset_category():
 # STORE PAGE
 # -------------------------
 if st.session_state.page == "store":
-    st.header("🛒 Store — Buy Items for Your Avatar & Premium")
+    st.header("🛒 Store — Buy Items for Your Avatar")
 
     st.write(f"Your capital: **${st.session_state.money}**")
 
