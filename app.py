@@ -170,7 +170,7 @@ question_categories = {
             "answer": 1,
             "value": 500,
             "explanation": (
-                "Accounts receivable are expected to be converted to cash within the a year."
+                "Accounts receivable are expected to be converted to cash within the year."
             ),
         },
     ],
@@ -216,21 +216,6 @@ question_categories = {
                 "Free cash flow = Operating cash flow − Capital expenditures, "
                 "showing cash available to grow the business or return to investors."
             ),
-        },
-        {
-            "question": "Which action is the most effective for improving a company’s short-term cash flow",
-            "options": [
-                "Increasing long-term capital investments",
-                "Negotiating longer payment terms with suppliers",
-                "Lowering product prices",
-                "Hiring additional staff",
-            ],
-            
-            "answer": 1,
-            "value": 600,
-            "explanation": (
-                "negotiating longer payment terms delays cash outflows and improves short term cash flow."
-                ),
         },
         {
             "question": "Which action is the most effective for improving a company’s short-term cash flow",
@@ -370,7 +355,7 @@ question_categories = {
                 "A list of employees and salaries including their stock options",
                 "A non-binding summary of key investment terms",
             ],
-            # 2x preference is $20m but capped by exit value: $15m -> index 3
+            
             "answer": 3,
             "value": 800,
             "explanation": (
